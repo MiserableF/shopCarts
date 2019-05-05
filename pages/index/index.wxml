@@ -1,0 +1,146 @@
+<import src="../../wxParse/wxParse.wxml" />
+<view class="top">
+    <view bindtap='changeTabs' data-index="0" class="{{chooseIndex==0?'choose':''}}">商品</view>
+    <view bindtap='changeTabs' data-index="1" class="{{chooseIndex==1?'choose':''}}">详情</view>
+</view>
+<swiper indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" interval="5000" duration="500" current="{{mainPicIndex}}" indicator-active-color="red" style="height:750rpx;">
+    <block wx:for="{{mainPicList}}" wx:key="unique">
+        <swiper-item>
+            <image src="{{item.url}}" data-index="{{index}}" style="width:100%;height:750rpx" />
+        </swiper-item>
+    </block>
+</swiper>
+
+<view class="goods-box">
+    <view class='share-box'>
+        <image src='/images/share.png'></image>
+        <view>分享</view>
+    </view>
+    <view class='goods-title'>{{itemName}}</view>
+    <view class='goods-price-box'>
+        <view class='goods-price'>￥{{salePriceStr}}</view>
+    </view>
+    <view class='orgin-price'>原价:
+        <text>￥{{origin}}</text>
+    </view>
+    <view class='goods-message'>
+        <view>快递：{{freight}}</view>
+        <!-- <view>{{origin}}</view> -->
+    </view>
+</view>
+<view class='parameter'>产品参数</view>
+<view wx:if="{{totalSysInventory>0}}" data-position="1" bindtap="showModal" class="color_scale_section">
+    <view>选择：</view>
+    <view wx:if="{{colorList.length > 0}}">颜色</view>
+    <view wx:if="{{scaleList.length > 0}}" style="margin-left:20rpx">尺寸</view>
+    <view class="icon_row">...</view>
+</view>
+<view class="detail" id="detail">
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+</view>
+<view class="shopping_cart_bottom">
+    <view wx:if="{{totalSysInventory==0}}" class='totalSysInventory'>( ⊙ o ⊙ ) 商品售罄啦，看看其他商品吧！</view>
+    <view wx:elif="{{isSale!=1 || status!=1}}" class='totalSysInventory'>( ⊙ o ⊙ ) 商品已下架，看看其他商品吧！</view>
+    <view class="cart_icon">
+        <view>
+            <view class='icon_one'>
+                <image src="/images/main.png" />
+            </view>
+            <view class='icon_two'>
+                首页
+            </view>
+        </view>
+    </view>
+    <view class="cart_icon">
+        <view>
+            <view class='icon_one'>
+                <image src="/images/cart.png" />
+            </view>
+            <view class='icon_two'>
+                购物车
+            </view>
+        </view>
+    </view>
+    <view wx:if='{{collectStatus}}' class="cart_icon">
+        <view class='icon_one'>
+            <image src="/images/star_h.png" />
+        </view>
+        <view class='icon_two'>
+            收藏
+        </view>
+    </view>
+    <view wx:else class="cart_icon">
+        <view class='icon_one'>
+            <image src="../../images/star.png" />
+        </view>
+        <view class='icon_two'>
+            收藏
+        </view>
+    </view>
+    <block wx:if="{{totalSysInventory>0 && isSale==1 && status==1}}">
+        <view data-position="2" bindtap="showModal" class="button" style="background:#FF8F00;">加入购物车</view>
+        <view data-position="3" bindtap="showModal" class="button" style="background:#FF436E;">立即购买</view>
+    </block>
+    <block wx:else>
+        <view class="button" style="width:450rpx;background:#FF8F00;">
+            查看店铺其他商品
+        </view>
+    </block>
+</view>
+<view class="mask" bindtap="hideModal" wx:if="{{showModalStatus}}"></view>
+<view class="shopping_cart" animation="{{animationData}}" wx:if="{{showModalStatus}}">
+    <view class="close" bindtap="hideModal">
+        <image src="https://b.yzcdn.cn/v2/image/wap/sku/icon_close.png" style="width:44rpx;height:44rpx" />
+    </view>
+    <view class="one_section">
+        <view class="pic">
+            <image src="{{shoppingCartSkuPic}}" mode="aspectFit" style="width:120rpx;height:120rpx" />
+        </view>
+        <view class="right">
+            <view class="title">{{itemName}}</view>
+            <view class="price">¥{{skuSalePrice}}</view>
+        </view>
+    </view>
+    <view class="two_section">
+        <view wx:if="{{colorList.length > 0}}" class="detail_section">
+            <view class="tab_name">颜色：</view>
+            <view wx:for="{{colorList}}" data-color="{{item}}" data-css="{{colorCssArr[index]}}" data-index="{{index}}" wx:key="unique" class="normal {{colorCssArr[index]}}" bindtap="selectColorFun">
+                {{item}}
+            </view>
+        </view>
+        <view wx:if="{{scaleList.length > 0}}" class="detail_section">
+            <view class="tab_name">尺寸：</view>
+            <view wx:for="{{scaleList}}" data-scale="{{item}}" data-css="{{scaleCssArr[index]}}" data-index="{{index}}" wx:key="unique" class="normal {{scaleCssArr[index]}}" bindtap="selectScaleFun">
+                {{item}}
+            </view>
+        </view>
+    </view>
+    <view class="three_section">
+        <view class="left">购买数量：</view>
+        <view class="right">
+            <view class="{{reduceBuyNumCss}}" bindtap="reduceBuyNum">-</view>
+            <view class="num">{{buyNum}}</view>
+            <view class="{{addBuyNumCss}}" bindtap="addBuyNum">+</view>
+        </view>
+    </view>
+    <view class="four_section">剩余{{skuInventory}}件</view>
+    <view class="five_section" wx:if="{{position == 1}}">
+        <view wx:if="{{selectSkuId}}" data-selectskuid="{{selectSkuId}}" style="background:#FF8F00">加入购物</view>
+        <view wx:else style="background:#FF8F00" class="opacity_5" bindtap="showAddTip">加入购物车</view>
+        <view wx:if="{{selectSkuId}}" data-selectskuid="{{selectSkuId}}" bindtap="toBuy" style="background:#FF436E">立即购买</view>
+        <view wx:else style="background:#FF436E" class="opacity_5" bindtap="showAddTip">立即购买</view>
+    </view>
+    <view class="five_section" wx:if="{{position == 2}}">
+        <view wx:if="{{selectSkuId}}" data-selectskuid="{{selectSkuId}}" class="addCart">加入购物车</view>
+        <view wx:else class="addCart opacity_5" bindtap="showAddTip">加入购物车</view>
+    </view>
+    <view class="five_section" wx:if="{{position == 3}}">
+        <view wx:if="{{selectSkuId}}" data-selectskuid="{{selectSkuId}}" class="toBuy">立即购买</view>
+        <view wx:else class="toBuy opacity_5">立即购买</view>
+    </view>
+</view>
+<view class="wxapp-toast-content-box" wx:if="{{isShowToast}}">
+    <view class="wxapp-toast-content">
+        <view class="wxapp-toast-content-text"> {{toastText}} </view>
+    </view>
+</view>

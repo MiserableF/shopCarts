@@ -1,0 +1,6 @@
+/**app.wxss**/
+text, view {
+    font-size: 28rpx;
+    font-weight: 400;
+    color: #333;
+}
